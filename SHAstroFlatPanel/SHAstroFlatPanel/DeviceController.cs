@@ -13,6 +13,7 @@ namespace ASCOM.SHAstroFlatPanel
         private Serial serialConnection = new Serial();
         private Boolean isConnected;
 
+        private const string DEVICE_GUID = "6C69985D-0974-4599-8367-8628E4B3F0F0";
         private const string SEPARATOR = "\n";
 
         internal DeviceController()
@@ -20,6 +21,12 @@ namespace ASCOM.SHAstroFlatPanel
             traceLogger = new TraceLogger("", "SHAstroFlatPanel DeviceController");
             traceLogger.Enabled = true;
             isConnected = false;
+
+            serialConnection.Speed = SerialSpeed.ps57600;
+            serialConnection.Parity = SerialParity.None;
+            serialConnection.StopBits = SerialStopBits.One;
+            serialConnection.DataBits = 8;
+            serialConnection.ReceiveTimeout = 10;
         }
 
         internal bool Connected
@@ -35,6 +42,25 @@ namespace ASCOM.SHAstroFlatPanel
         {
             traceLogger.LogMessage("Connect called", "comPortDefault=" + comPortDefault + ", comPortAutoDetect=" + comPortAutoDetect.ToString());
 
+            if(comPortDefault.Length > 0 && TryDetect(comPortDefault))
+            {
+                bool isSuccess = DoConnect(comPortDefault);
+                isConnected = isSuccess;
+                return new ConnectResult(isSuccess, comPortDefault);
+            }
+
+            if(comPortAutoDetect)
+            {
+                string detectedComPort = DetectCOMPort();
+                if (detectedComPort != null)
+                {
+                    bool isSuccess = DoConnect(detectedComPort);
+                    isConnected = isSuccess;
+                    return new ConnectResult(isSuccess, detectedComPort);
+                }
+            }
+
+            isConnected = false;
             return new ConnectResult(false, "");
         }
 
@@ -111,6 +137,18 @@ namespace ASCOM.SHAstroFlatPanel
             return ReadResponse().Payload;
         }
 
+        /// <summary>
+        /// Send the given command to the device.
+        /// </summary>
+        /// <param name="command">Command to send</param>
+        /// <returns>Response returned by the device</returns>
+        private bool CommandBool(string command)
+        {
+            traceLogger.LogMessage("CommandBool", "Sending command " + command);
+            serialConnection.Transmit(command + SEPARATOR);
+            return ReadResponse().StatusCode == Response.Status.OK;
+        }
+
         private void CommandVoid(string command)
         {
             traceLogger.LogMessage("CommandVoid", "Sending command " + command);
@@ -125,6 +163,106 @@ namespace ASCOM.SHAstroFlatPanel
             response = response.Replace("\r", "").Replace("\n", "");
             traceLogger.LogMessage("ReadResponse End", "Received response " + response);
             return new Response(response);
+        }
+
+        bool DoConnect(string comPort)
+        {
+            traceLogger.LogMessage("DoConnect", "Connecting to port " + comPort);
+            serialConnection.PortName = comPort;
+            serialConnection.Connected = true;
+            Response response = ReadResponse();
+            if (response.StatusCode != Response.Status.OK)
+            {
+                traceLogger.LogMessage("DoConnect", "Connecting to port " + comPort + " failed!");
+                serialConnection.Connected = false;
+                return false;
+            }
+
+            return true;
+        }
+
+        string DetectCOMPort()
+        {
+            foreach (string portName in System.IO.Ports.SerialPort.GetPortNames())
+            {
+                traceLogger.LogMessage("DetectCOMPort", $"Trying port {portName}...");
+
+                if (TryDetect(portName))
+                {
+                    traceLogger.LogMessage("DetectCOMPort", $"Successfully detected the COM port: {portName}");
+                    return portName;
+                }
+                else
+                {
+                    continue;
+                }
+            }
+
+            traceLogger.LogMessage("DetectCOMPort", "Failed detecting the COM port!");
+            return null;
+        }
+
+        bool TryDetect(string comPort)
+        {
+            traceLogger.LogMessage("TryConnect", $"Trying port {comPort}...");
+
+            Serial serial = null;
+
+            try
+            {
+                serial = new Serial
+                {
+                    Speed = SerialSpeed.ps57600,
+                    PortName = comPort,
+                    Connected = true,
+                    ReceiveTimeout = 1,
+                    Parity = SerialParity.None,
+                    StopBits = SerialStopBits.One,
+                    DataBits = 8
+                };
+            }
+            catch (Exception)
+            {
+                // If trying to connect to a port that is already in use, an exception will be thrown.
+                return false;
+            }
+
+            // Wait a second for the serial connection to establish
+            System.Threading.Thread.Sleep(1000);
+
+            serial.ClearBuffers();
+
+            // Poll the device (with a short timeout value) until successful,
+            // or until we've reached the retry count limit of 3...
+            bool success = false;
+            for (int retries = 3; retries >= 0; retries--)
+            {
+                string response = "";
+                try
+                {
+                    // Try to handle the INITIALIZED# message
+                    _ = serial.ReceiveTerminated(SEPARATOR);
+                    serial.Transmit(Commands.Ping + SEPARATOR);
+                    response = serial.ReceiveTerminated(SEPARATOR).Trim().Replace("\r", "").Replace("\n", "");
+                }
+                catch (Exception)
+                {
+                    traceLogger.LogMessage("TryConnect", $"Port {comPort} in use or the timeout happend!");
+                    // PortInUse or Timeout exceptions may happen here!
+                    // We ignore them.
+                }
+                traceLogger.LogMessage("TryConnect", $"Response from {comPort} is {response}");
+                if (response == "OK:" + DEVICE_GUID)
+                {
+                    success = true;
+                    break;
+                }
+            }
+
+            serial.Connected = false;
+            serial.Dispose();
+
+            return success;
         }
 
         internal struct ConnectResult

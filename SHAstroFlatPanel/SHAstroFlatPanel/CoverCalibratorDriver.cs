@@ -211,12 +211,12 @@ namespace ASCOM.SHAstroFlatPanel
         {
             get
             {
-                LogMessage("Connected", "Get {0}", IsConnected);
+                LogMessage("Connected Get", "Get {0}", IsConnected);
                 return IsConnected;
             }
             set
             {
-                tl.LogMessage("Connected", "Set {0}", value);
+                tl.LogMessage("Connected Set", "Set {0}", value);
                 if (value == IsConnected)
                     return;
 
