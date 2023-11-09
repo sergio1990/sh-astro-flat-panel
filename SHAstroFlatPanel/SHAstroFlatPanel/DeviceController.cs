@@ -43,6 +43,18 @@ namespace ASCOM.SHAstroFlatPanel
             isConnected = false;
         }
 
+        internal int Brightness
+        {
+            get
+            {
+                return 0;
+            }
+            set
+            {
+                // TODO: add implementation
+            }
+        }
+
         public void Dispose()
         {
             traceLogger.Enabled = false;

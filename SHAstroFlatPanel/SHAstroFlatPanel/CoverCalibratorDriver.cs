@@ -83,7 +83,7 @@ namespace ASCOM.SHAstroFlatPanel
 
         internal static string comPort; // Variables to hold the current device configuration
 
-        private DeviceController deviceController;
+        private readonly DeviceController deviceController;
 
         /// <summary>
         /// Private variable to hold an ASCOM Utilities object
@@ -350,8 +350,9 @@ namespace ASCOM.SHAstroFlatPanel
         {
             get
             {
-                tl.LogMessage("Brightness Get", "Not implemented");
-                throw new ASCOM.PropertyNotImplementedException("Brightness", false);
+                int brightness = deviceController.Brightness;
+                tl.LogMessage("Brightness Get", brightness.ToString());
+                return brightness;
             }
         }
 
@@ -373,8 +374,8 @@ namespace ASCOM.SHAstroFlatPanel
         /// <param name="Brightness"></param>
         public void CalibratorOn(int Brightness)
         {
-            tl.LogMessage("CalibratorOn", $"Not implemented. Value set: {Brightness}");
-            throw new ASCOM.MethodNotImplementedException("CalibratorOn");
+            tl.LogMessage("CalibratorOn", Brightness.ToString());
+            deviceController.Brightness = Brightness;
         }
 
         /// <summary>
@@ -382,8 +383,8 @@ namespace ASCOM.SHAstroFlatPanel
         /// </summary>
         public void CalibratorOff()
         {
-            tl.LogMessage("CalibratorOff", "Not implemented");
-            throw new ASCOM.MethodNotImplementedException("CalibratorOff");
+            tl.LogMessage("CalibratorOff", "");
+            deviceController.Brightness = 0;
         }
 
         #endregion
