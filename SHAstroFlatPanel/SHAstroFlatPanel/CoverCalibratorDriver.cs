@@ -38,6 +38,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
+using static ASCOM.SHAstroFlatPanel.DeviceController;
 
 namespace ASCOM.SHAstroFlatPanel
 {
@@ -78,15 +79,11 @@ namespace ASCOM.SHAstroFlatPanel
         internal static string traceStateProfileName = "Trace Level";
         internal static string traceStateDefault = "false";
         internal static bool autoDetectComPort = Convert.ToBoolean(autoDetectComPortDefault);
-        internal static string comPortOverride;
         private const int MAX_BRIGHTNESS = 255;
 
         internal static string comPort; // Variables to hold the current device configuration
 
-        /// <summary>
-        /// Private variable to hold the connected state
-        /// </summary>
-        private bool connectedState;
+        private DeviceController deviceController;
 
         /// <summary>
         /// Private variable to hold an ASCOM Utilities object
@@ -114,7 +111,7 @@ namespace ASCOM.SHAstroFlatPanel
 
             tl.LogMessage("CoverCalibrator", "Starting initialisation");
 
-            connectedState = false; // Initialise connected to false
+            deviceController = new DeviceController();
             utilities = new Util(); //Initialise util object
             astroUtilities = new AstroUtils(); // Initialise astro-utilities object
             //TODO: Implement your additional construction here
@@ -225,15 +222,17 @@ namespace ASCOM.SHAstroFlatPanel
 
                 if (value)
                 {
-                    connectedState = true;
                     LogMessage("Connected Set", "Connecting to port {0}", comPort);
-                    // TODO connect to the device
+                    ConnectResult result = deviceController.Connect(comPort, autoDetectComPort);
+                    if (result.IsConnected)
+                    {
+                        comPort = result.ComPort;
+                    }
                 }
                 else
                 {
-                    connectedState = false;
                     LogMessage("Connected Set", "Disconnecting from port {0}", comPort);
-                    // TODO disconnect from the device
+                    deviceController.Disconnect();
                 }
             }
         }
@@ -300,6 +299,7 @@ namespace ASCOM.SHAstroFlatPanel
         {
             get
             {
+                tl.LogMessage("CoverState Get", CoverStatus.NotPresent.ToString());
                 return CoverStatus.NotPresent;
             }
         }
@@ -338,6 +338,7 @@ namespace ASCOM.SHAstroFlatPanel
         {
             get
             {
+                tl.LogMessage("CalibratorState Get", CalibratorStatus.Ready.ToString());
                 return CalibratorStatus.Ready;
             }
         }
@@ -361,6 +362,7 @@ namespace ASCOM.SHAstroFlatPanel
         {
             get
             {
+                tl.LogMessage("MaxBrightness Get", MAX_BRIGHTNESS.ToString());
                 return MAX_BRIGHTNESS;
             }
         }
@@ -471,8 +473,8 @@ namespace ASCOM.SHAstroFlatPanel
         {
             get
             {
-                // TODO check that the driver hardware connection exists and is connected to the hardware
-                return connectedState;
+                tl.LogMessage("IsConnected Get", deviceController.Connected.ToString());
+                return deviceController.Connected;
             }
         }
 
@@ -512,7 +514,7 @@ namespace ASCOM.SHAstroFlatPanel
                 driverProfile.DeviceType = "CoverCalibrator";
                 driverProfile.WriteValue(driverID, traceStateProfileName, tl.Enabled.ToString());
                 driverProfile.WriteValue(driverID, autoDetectComPortProfileName, autoDetectComPort.ToString());
-                if (!(comPortOverride is null)) driverProfile.WriteValue(driverID, comPortProfileName, comPortOverride.ToString());
+                driverProfile.WriteValue(driverID, comPortProfileName, comPort.ToString());
             }
         }
 
