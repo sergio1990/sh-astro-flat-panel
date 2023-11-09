@@ -35,6 +35,7 @@ namespace ASCOM.SHAstroFlatPanel
             this.label2 = new System.Windows.Forms.Label();
             this.chkTrace = new System.Windows.Forms.CheckBox();
             this.comboBoxComPort = new System.Windows.Forms.ComboBox();
+            this.chkAutoDetectComPort = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             this.SuspendLayout();
             // 
@@ -96,7 +97,7 @@ namespace ASCOM.SHAstroFlatPanel
             // chkTrace
             // 
             this.chkTrace.AutoSize = true;
-            this.chkTrace.Location = new System.Drawing.Point(77, 118);
+            this.chkTrace.Location = new System.Drawing.Point(16, 137);
             this.chkTrace.Name = "chkTrace";
             this.chkTrace.Size = new System.Drawing.Size(69, 17);
             this.chkTrace.TabIndex = 6;
@@ -111,11 +112,22 @@ namespace ASCOM.SHAstroFlatPanel
             this.comboBoxComPort.Size = new System.Drawing.Size(90, 21);
             this.comboBoxComPort.TabIndex = 7;
             // 
+            // chkAutoDetectComPort
+            // 
+            this.chkAutoDetectComPort.AutoSize = true;
+            this.chkAutoDetectComPort.Location = new System.Drawing.Point(16, 114);
+            this.chkAutoDetectComPort.Name = "chkAutoDetectComPort";
+            this.chkAutoDetectComPort.Size = new System.Drawing.Size(132, 17);
+            this.chkAutoDetectComPort.TabIndex = 9;
+            this.chkAutoDetectComPort.Text = "Auto-Detect COM Port";
+            this.chkAutoDetectComPort.UseVisualStyleBackColor = true;
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(350, 175);
+            this.Controls.Add(this.chkAutoDetectComPort);
             this.Controls.Add(this.comboBoxComPort);
             this.Controls.Add(this.chkTrace);
             this.Controls.Add(this.label2);
@@ -145,5 +157,6 @@ namespace ASCOM.SHAstroFlatPanel
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox chkTrace;
         private System.Windows.Forms.ComboBox comboBoxComPort;
+        private System.Windows.Forms.CheckBox chkAutoDetectComPort;
     }
 }

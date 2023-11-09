@@ -31,6 +31,7 @@ namespace ASCOM.SHAstroFlatPanel
             // Place any validation constraint checks here
             // Update the state variables with results from the dialogue
             CoverCalibrator.comPort = (string)comboBoxComPort.SelectedItem;
+            CoverCalibrator.autoDetectComPort = chkAutoDetectComPort.Checked;
             tl.Enabled = chkTrace.Checked;
         }
 
@@ -58,6 +59,7 @@ namespace ASCOM.SHAstroFlatPanel
 
         private void InitUI()
         {
+            chkAutoDetectComPort.Checked = CoverCalibrator.autoDetectComPort;
             chkTrace.Checked = tl.Enabled;
             // set the list of com ports to those that are currently available
             comboBoxComPort.Items.Clear();

@@ -70,10 +70,14 @@ namespace ASCOM.SHAstroFlatPanel
         /// </summary>
         private static string driverDescription = "SHAstro’s Flat Panel";
 
+
+        internal static string autoDetectComPortProfileName = "Auto-Detect COM Port";
+        internal static string autoDetectComPortDefault = "true";
         internal static string comPortProfileName = "COM Port"; // Constants used for Profile persistence
         internal static string comPortDefault = "COM1";
         internal static string traceStateProfileName = "Trace Level";
         internal static string traceStateDefault = "false";
+        internal static bool autoDetectComPort = Convert.ToBoolean(autoDetectComPortDefault);
 
         private const int MAX_BRIGHTNESS = 255;
 
