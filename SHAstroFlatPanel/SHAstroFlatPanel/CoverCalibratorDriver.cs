@@ -68,12 +68,14 @@ namespace ASCOM.SHAstroFlatPanel
         /// <summary>
         /// Driver description that displays in the ASCOM Chooser.
         /// </summary>
-        private static string driverDescription = "ASCOM CoverCalibrator Driver for SHAstroFlatPanel.";
+        private static string driverDescription = "SHAstro’s Flat Panel";
 
         internal static string comPortProfileName = "COM Port"; // Constants used for Profile persistence
         internal static string comPortDefault = "COM1";
         internal static string traceStateProfileName = "Trace Level";
         internal static string traceStateDefault = "false";
+
+        private const int MAX_BRIGHTNESS = 255;
 
         internal static string comPort; // Variables to hold the current device configuration
 
@@ -247,8 +249,7 @@ namespace ASCOM.SHAstroFlatPanel
             get
             {
                 Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                // TODO customise this driver description
-                string driverInfo = "Information about the driver itself. Version: " + String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);
+                string driverInfo = driverDescription + " ASCOM Driver Version " + String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);
                 tl.LogMessage("DriverInfo Get", driverInfo);
                 return driverInfo;
             }
@@ -279,9 +280,8 @@ namespace ASCOM.SHAstroFlatPanel
         {
             get
             {
-                string name = "Short driver name - please customise";
-                tl.LogMessage("Name Get", name);
-                return name;
+                tl.LogMessage("Name Get", driverDescription);
+                return driverDescription;
             }
         }
 
@@ -296,8 +296,7 @@ namespace ASCOM.SHAstroFlatPanel
         {
             get
             {
-                tl.LogMessage("CoverState Get", "Not implemented");
-                throw new ASCOM.PropertyNotImplementedException("CoverState", false);
+                return CoverStatus.NotPresent;
             }
         }
 
@@ -335,8 +334,7 @@ namespace ASCOM.SHAstroFlatPanel
         {
             get
             {
-                tl.LogMessage("CalibratorState Get", "Not implemented");
-                throw new ASCOM.PropertyNotImplementedException("CalibratorState", false);
+                return CalibratorStatus.Ready;
             }
         }
 
@@ -359,8 +357,7 @@ namespace ASCOM.SHAstroFlatPanel
         {
             get
             {
-                tl.LogMessage("MaxBrightness Get", "Not implemented");
-                throw new ASCOM.PropertyNotImplementedException("MaxBrightness", false);
+                return MAX_BRIGHTNESS;
             }
         }
 

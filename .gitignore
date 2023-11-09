@@ -1,0 +1,4 @@
+/SHAstroFlatPanel/SHAstroFlatPanel/bin/**/*
+/SHAstroFlatPanel/SHAstroFlatPanel/obj/**/*
+/SHAstroFlatPanel/.vs/**/*
+/DriverInstaller/*.exe
