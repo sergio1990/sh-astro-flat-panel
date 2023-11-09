@@ -78,7 +78,7 @@ namespace ASCOM.SHAstroFlatPanel
         internal static string traceStateProfileName = "Trace Level";
         internal static string traceStateDefault = "false";
         internal static bool autoDetectComPort = Convert.ToBoolean(autoDetectComPortDefault);
-
+        internal static string comPortOverride;
         private const int MAX_BRIGHTNESS = 255;
 
         internal static string comPort; // Variables to hold the current device configuration
@@ -497,6 +497,7 @@ namespace ASCOM.SHAstroFlatPanel
             {
                 driverProfile.DeviceType = "CoverCalibrator";
                 tl.Enabled = Convert.ToBoolean(driverProfile.GetValue(driverID, traceStateProfileName, string.Empty, traceStateDefault));
+                autoDetectComPort = Convert.ToBoolean(driverProfile.GetValue(driverID, autoDetectComPortProfileName, string.Empty, autoDetectComPortDefault));
                 comPort = driverProfile.GetValue(driverID, comPortProfileName, string.Empty, comPortDefault);
             }
         }
@@ -510,7 +511,8 @@ namespace ASCOM.SHAstroFlatPanel
             {
                 driverProfile.DeviceType = "CoverCalibrator";
                 driverProfile.WriteValue(driverID, traceStateProfileName, tl.Enabled.ToString());
-                driverProfile.WriteValue(driverID, comPortProfileName, comPort.ToString());
+                driverProfile.WriteValue(driverID, autoDetectComPortProfileName, autoDetectComPort.ToString());
+                if (!(comPortOverride is null)) driverProfile.WriteValue(driverID, comPortProfileName, comPortOverride.ToString());
             }
         }
 
