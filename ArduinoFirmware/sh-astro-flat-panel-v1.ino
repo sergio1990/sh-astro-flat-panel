@@ -24,7 +24,7 @@ void setup() {
   Serial.begin(57600, SERIAL_8N1);
   Serial.setTimeout(100);
   while (!Serial);
-  Serial.println("INITIALIZED#");
+  Serial.println("OK:INITIALIZED");
 
   TCCR2B = TCCR2B & B11111000 | B00000010; // for PWM frequency of 3921.16 Hz
   pinMode(LED_PIN, OUTPUT);
